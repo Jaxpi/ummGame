@@ -37,7 +37,7 @@
             <button id="btn-rules-ready" disabled onclick="confirmRules()">Ready</button>
         </div>
 
-        <!-- Game Board Screen -->
+        <!-- Game Board Screen (Tablet Optimized Console View) -->
         <div id="screen-game-board" class="screen">
             
             <div id="timer-container">
@@ -45,38 +45,48 @@
                 <p class="timer-hint">Tap: Play/Pause | Hold 1s: Reset</p>
             </div>
 
-            <!-- Modern Fluid Grid Layout centering cards exactly beside slots 15, 10, 5 -->
-            <div class="board-wrapper">
+            <div class="tablet-board-console">
                 
-                <!-- Left Cards Column (Targeting Team A) -->
-                <div class="card-column">
-                    <div id="card-left-15" class="penalty-card card-15"><span>Face Down</span></div>
-                    <div id="card-left-10" class="penalty-card card-10"><span>Face Down</span></div>
-                    <div id="card-left-5" class="penalty-card card-5"><span>Face Down</span></div>
+                <!-- ROW 1: Team A Layout -->
+                <div class="team-row">
+                    <div class="row-header title-a">Team A</div>
+                    <div id="squares-container-A" class="squares-row"></div>
                 </div>
 
-                <!-- Central Numeric Columns -->
-                <div class="tracks-grid">
-                    <div class="track-column">
-                        <div class="track-title title-a">Team A</div>
-                        <div id="squares-container-A" class="squares-stack"></div>
-                    </div>
-                    <div class="track-column">
-                        <div class="track-title title-b">Team B</div>
-                        <div id="squares-container-B" class="squares-stack"></div>
+                <!-- ROW 2: Shared Rule Cards Layout (Clutter Removed) -->
+                <div class="cards-display-row">
+                    <div class="cards-inner-grid">
+                        <div id="card-left-5" class="penalty-card card-milestone-5"><span>Rule</span></div>
+                        <div id="card-left-10" class="penalty-card card-milestone-10"><span>Rule</span></div>
+                        <div id="card-left-15" class="penalty-card card-milestone-15"><span>Rule</span></div>
                     </div>
                 </div>
 
-                <!-- Right Cards Column (Targeting Team B) -->
-                <div class="card-column">
-                    <div id="card-right-15" class="penalty-card card-15"><span>Face Down</span></div>
-                    <div id="card-right-10" class="penalty-card card-10"><span>Face Down</span></div>
-                    <div id="card-right-5" class="penalty-card card-5"><span>Face Down</span></div>
+                <div class="cards-display-row">
+                    <div class="cards-inner-grid">
+                        <div id="card-right-5" class="penalty-card card-milestone-5"><span>Rule</span></div>
+                        <div id="card-right-10" class="penalty-card card-milestone-10"><span>Rule</span></div>
+                        <div id="card-right-15" class="penalty-card card-milestone-15"><span>Rule</span></div>
+                    </div>
+                </div>
+
+                <!-- ROW 3: Team B Layout -->
+                <div class="team-row">
+                    <div class="row-header title-b">Team B</div>
+                    <div id="squares-container-B" class="squares-row"></div>
                 </div>
 
             </div>
             
             <button class="abandon-btn" onclick="location.reload()">Abandon Game</button>
+        </div>
+
+        <!-- Victory Modal Screen Overlay -->
+        <div id="screen-victory" class="screen modal-overlay">
+            <div class="victory-card">
+                <h2 id="victory-message">Team Wins!</h2>
+                <button class="home-btn" onclick="location.reload()">Return Home</button>
+            </div>
         </div>
 
     </div>

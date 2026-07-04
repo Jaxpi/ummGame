@@ -39,14 +39,13 @@ let teamBRules = [];
 let currentSelectingTeam = '';
 let selectedIndices = [];
 
-// Game Progression Engine
-let teamAProgress = 0; // Tracks highest tapped square index for Team A
-let teamBProgress = 0; // Tracks highest tapped square index for Team B
+let teamAProgress = 0; 
+let teamBProgress = 0; 
 
 let timerInterval = null;
 let timeLeft = 60;
 let isTimerRunning = false;
-let isTimerLocked = false; // Freeze state triggered by milestone hits
+let isTimerLocked = false; 
 let timerTouchStart = 0;
 
 function navigateTo(screenId) {
@@ -134,7 +133,7 @@ function startGameBoard() {
     buildTrackSquares('A');
     buildTrackSquares('B');
 
-    // Attach text variables into structural dataset keys safely
+    // Index mappings: slot 5=index 0, slot 10=index 1, slot 15=index 2
     document.getElementById('card-left-5').dataset.rule = teamBRules[0];
     document.getElementById('card-left-10').dataset.rule = teamBRules[1];
     document.getElementById('card-left-15').dataset.rule = teamBRules[2];
@@ -162,14 +161,10 @@ function buildTrackSquares(teamId) {
     }
 }
 
-// Sequential Tapping Logic System
 function handleSquareTap(teamId, squareNum, element) {
-    // Win spaces do not change color yet per instructions
-    if (squareNum === 20) return; 
-
     let currentProgress = (teamId === 'A') ? teamAProgress : teamBProgress;
 
-    // Rule check: Must tap the exact next block in sequence
+    // Strict sequential rule matching
     if (squareNum === currentProgress + 1) {
         if (teamId === 'A') {
             teamAProgress = squareNum;
@@ -180,42 +175,50 @@ function handleSquareTap(teamId, squareNum, element) {
         }
         element.style.color = '#000';
 
-        // Check for rules milestone activation steps
+        // Check for victory handling condition
+        if (squareNum === 20) {
+            triggerVictory(teamId);
+            return;
+        }
+
+        // Check for rules milestone activations
         if (squareNum === 5 || squareNum === 10 || squareNum === 15) {
             triggerMilestoneCard(teamId, squareNum);
         }
     }
 }
 
-// Flash, Reveal, and Temporary Timer Freeze Engine
 function triggerMilestoneCard(teamId, step) {
-    // Team A triggers cards placed on Left side (Team B's rules targeting Team A)
-    // Team B triggers cards placed on Right side (Team A's rules targeting Team B)
     const side = (teamId === 'A') ? 'left' : 'right';
     const targetCard = document.getElementById(`card-${side}-${step}`);
     
     if (!targetCard || targetCard.classList.contains('revealed')) return;
 
-    // Pause timer execution loop instantly
+    // Freeze timer tracking loop loop safely
     let wasRunning = isTimerRunning;
     isTimerRunning = false;
     isTimerLocked = true;
     clearInterval(timerInterval);
 
+    // Apply flash class instantly
     targetCard.classList.add('flashing');
+    targetCard.classList.add('revealed');
+    targetCard.innerHTML = `<strong>${targetCard.dataset.rule}</strong>`;
 
-    // Run animation phase then execute string reveal
+    // Wait exactly 2 seconds before unfreezing timer controls to give teams reading time
     setTimeout(() => {
         targetCard.classList.remove('flashing');
-        targetCard.classList.add('revealed');
-        targetCard.innerHTML = `<strong>${targetCard.dataset.rule}</strong>`;
-        
-        // Restore timer capabilities after the 2-second rule viewing window closes
         isTimerLocked = false;
         if (wasRunning) {
             startTimer();
         }
     }, 2000);
+}
+
+function triggerVictory(teamName) {
+    pauseTimer();
+    document.getElementById('victory-message').innerText = `Team ${teamName} Wins!`;
+    navigateTo('screen-victory');
 }
 
 function setupTimerInteractions() {
