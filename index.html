@@ -15,7 +15,7 @@
             <h1>Um... Game Companion</h1>
             <div class="menu-buttons">
                 <button id="btn-new-game" onclick="navigateTo('screen-team-select')">New Game</button>
-                <button id="btn-cards-tab" onclick="alert('Words tab under development!')">Cards</button>
+                <button id="btn-cards-tab" onclick="navigateTo('screen-words-view')">Cards / Words</button>
             </div>
         </div>
 
@@ -37,23 +37,21 @@
             <button id="btn-rules-ready" disabled onclick="confirmRules()">Ready</button>
         </div>
 
-        <!-- Game Board Screen (Tablet Optimized Console View) -->
+        <!-- Game Board Screen -->
         <div id="screen-game-board" class="screen">
-            
             <div id="timer-container">
                 <div id="timer-display">60</div>
                 <p class="timer-hint">Tap: Play/Pause | Hold 1s: Reset</p>
             </div>
 
             <div class="tablet-board-console">
-                
                 <!-- ROW 1: Team A Layout -->
                 <div class="team-row">
                     <div class="row-header title-a">Team A</div>
                     <div id="squares-container-A" class="squares-row"></div>
                 </div>
 
-                <!-- ROW 2: Shared Rule Cards Layout (Clutter Removed) -->
+                <!-- ROW 2: Shared Rule Cards Layout -->
                 <div class="cards-display-row">
                     <div class="cards-inner-grid">
                         <div id="card-left-5" class="penalty-card card-milestone-5"><span>Rule</span></div>
@@ -75,17 +73,27 @@
                     <div class="row-header title-b">Team B</div>
                     <div id="squares-container-B" class="squares-row"></div>
                 </div>
-
             </div>
             
-            <button class="abandon-btn" onclick="location.reload()">Abandon Game</button>
+            <button class="abandon-btn" onclick="resetToHome(event)">Abandon Game</button>
+        </div>
+
+        <!-- Words/Cards Tab Screen View -->
+        <div id="screen-words-view" class="screen">
+            <h2>Words Deck</h2>
+            <div class="word-card-box">
+                <p class="word-hint">Ready to play?</p>
+            </div>
+            <div class="menu-buttons">
+                <button onclick="resetToHome(event)">Back to Menu</button>
+            </div>
         </div>
 
         <!-- Victory Modal Screen Overlay -->
         <div id="screen-victory" class="screen modal-overlay">
             <div class="victory-card">
                 <h2 id="victory-message">Team Wins!</h2>
-                <button class="home-btn" onclick="location.reload()">Return Home</button>
+                <button class="home-btn" onclick="resetToHome(event)">Return Home</button>
             </div>
         </div>
 

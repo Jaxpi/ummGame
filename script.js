@@ -49,9 +49,32 @@ let isTimerLocked = false;
 let timerTouchStart = 0;
 
 function navigateTo(screenId) {
+    // Structural screening helper
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
     if (screenId === 'screen-team-select') checkGameReadyStatus();
+}
+
+function resetToHome(event) {
+    if(event) event.preventDefault();
+    pauseTimer();
+    
+    // Clear selections completely
+    teamARules = [];
+    teamBRules = [];
+    teamAProgress = 0;
+    teamBProgress = 0;
+    
+    // Re-enable team select button appearances
+    const btnA = document.getElementById('btn-team-a');
+    const btnB = document.getElementById('btn-team-b');
+    if(btnA) { btnA.innerText = 'Team A'; btnA.style.opacity = '1'; }
+    if(btnB) { btnB.innerText = 'Team B'; btnB.style.opacity = '1'; }
+    
+    const startMatchBtn = document.getElementById('btn-start-match');
+    if(startMatchBtn) startMatchBtn.classList.add('hidden');
+
+    navigateTo('screen-welcome');
 }
 
 function shuffle(array) {
@@ -133,7 +156,13 @@ function startGameBoard() {
     buildTrackSquares('A');
     buildTrackSquares('B');
 
-    // Index mappings: slot 5=index 0, slot 10=index 1, slot 15=index 2
+    // Clean placeholder configurations 
+    const pCards = document.querySelectorAll('.penalty-card');
+    pCards.forEach(c => {
+        c.classList.remove('revealed', 'flashing');
+        c.innerHTML = '<span>Rule</span>';
+    });
+
     document.getElementById('card-left-5').dataset.rule = teamBRules[0];
     document.getElementById('card-left-10').dataset.rule = teamBRules[1];
     document.getElementById('card-left-15').dataset.rule = teamBRules[2];
@@ -164,7 +193,6 @@ function buildTrackSquares(teamId) {
 function handleSquareTap(teamId, squareNum, element) {
     let currentProgress = (teamId === 'A') ? teamAProgress : teamBProgress;
 
-    // Strict sequential rule matching
     if (squareNum === currentProgress + 1) {
         if (teamId === 'A') {
             teamAProgress = squareNum;
@@ -175,13 +203,11 @@ function handleSquareTap(teamId, squareNum, element) {
         }
         element.style.color = '#000';
 
-        // Check for victory handling condition
         if (squareNum === 20) {
             triggerVictory(teamId);
             return;
         }
 
-        // Check for rules milestone activations
         if (squareNum === 5 || squareNum === 10 || squareNum === 15) {
             triggerMilestoneCard(teamId, squareNum);
         }
@@ -194,18 +220,15 @@ function triggerMilestoneCard(teamId, step) {
     
     if (!targetCard || targetCard.classList.contains('revealed')) return;
 
-    // Freeze timer tracking loop loop safely
     let wasRunning = isTimerRunning;
     isTimerRunning = false;
     isTimerLocked = true;
     clearInterval(timerInterval);
 
-    // Apply flash class instantly
     targetCard.classList.add('flashing');
     targetCard.classList.add('revealed');
     targetCard.innerHTML = `<strong>${targetCard.dataset.rule}</strong>`;
 
-    // Wait exactly 2 seconds before unfreezing timer controls to give teams reading time
     setTimeout(() => {
         targetCard.classList.remove('flashing');
         isTimerLocked = false;

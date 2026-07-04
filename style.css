@@ -29,8 +29,10 @@ body {
     text-align: center;
 }
 
-.screen { display: none; }
-.screen.active { display: block; }
+/* Base screen states */
+.screen { display: none !important; }
+.screen.active { display: block !important; }
+.screen.active.modal-overlay { display: flex !important; }
 
 h1 { color: var(--accent-color); margin-top: 10px; }
 .menu-buttons { display: flex; flex-direction: column; gap: 15px; padding: 20px; max-width: 400px; margin: 0 auto; }
@@ -49,7 +51,6 @@ button {
 #btn-start-match { border-color: #28a745; background: rgba(40,167,69,0.1); }
 .hidden { display: none !important; }
 
-/* Setup grid configuration */
 .grid-6 {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -76,7 +77,6 @@ button {
 
 #btn-rules-ready:disabled { background: #333; color: #777; border-color: #222; }
 
-/* Match Timer Dashboard elements */
 #timer-container { margin-bottom: 10px; }
 #timer-display {
     font-size: 2.8rem;
@@ -91,7 +91,6 @@ button {
 }
 .timer-hint { font-size: 0.75rem; color: #666; margin: 2px 0; }
 
-/* Horizontal Console System */
 .tablet-board-console {
     display: flex;
     flex-direction: column;
@@ -140,7 +139,6 @@ button {
     font-size: 0.9rem;
     box-sizing: border-box;
     cursor: pointer;
-    transition: background 0.15s ease;
 }
 
 .board-square.win-space {
@@ -148,7 +146,6 @@ button {
     border-color: #28a745;
 }
 
-/* Row wrapper cleanup - spans fully across row width now */
 .cards-display-row {
     padding-left: 90px; 
     box-sizing: border-box;
@@ -162,7 +159,6 @@ button {
     height: 50px;
 }
 
-/* Aspect-Ratio: Strict 2:1 Wide Layout rules */
 .penalty-card {
     grid-column-span: 3;
     aspect-ratio: 2 / 1;
@@ -187,11 +183,7 @@ button {
 .card-milestone-10 { left: calc((100% / 20) * 9.5); }
 .card-milestone-15 { left: calc((100% / 20) * 14.5); }
 
-/* Instant White Color Flash System */
-.penalty-card.flashing {
-    animation: white-flash-glow 0.3s ease-in-out;
-}
-
+.penalty-card.flashing { animation: white-flash-glow 0.3s ease-in-out; }
 .penalty-card.revealed {
     background: #2d2d2d;
     border: 2px solid var(--accent-color);
@@ -227,16 +219,15 @@ button {
     box-shadow: 0 0 20px rgba(255, 159, 67, 0.3);
 }
 
-.victory-card h2 {
-    font-size: 2.5rem;
-    color: #fff;
-    margin-bottom: 30px;
-}
+.victory-card h2 { font-size: 2.5rem; color: #fff; margin-bottom: 30px; }
+.home-btn { background: var(--accent-color); color: #000; border: none; padding: 12px 30px; font-size: 1.1rem; }
 
-.home-btn {
-    background: var(--accent-color);
-    color: #000;
-    border: none;
-    padding: 12px 30px;
-    font-size: 1.1rem;
+/* Placeholder Words view container */
+.word-card-box {
+    background: var(--card-bg);
+    border: 2px dashed var(--accent-color);
+    padding: 40px 20px;
+    margin: 20px auto;
+    max-width: 400px;
+    border-radius: 10px;
 }
