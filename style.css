@@ -20,7 +20,7 @@ body {
     padding: 15px;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
-    overflow: hidden;
+    overflow-x: hidden;
 }
 
 #app-container {
@@ -146,11 +146,7 @@ button {
     border-color: #28a745;
 }
 
-.cards-display-row {
-    padding-left: 90px; 
-    box-sizing: border-box;
-}
-
+.cards-display-row { padding-left: 90px; box-sizing: border-box; }
 .cards-inner-grid {
     display: grid;
     grid-template-columns: repeat(20, 1fr);
@@ -199,7 +195,6 @@ button {
 
 .abandon-btn { background: none; border: 1px solid #444; color: #565656; margin-top: 10px; padding: 6px 12px; font-size: 0.8rem;}
 
-/* Victory Screen Overlay Modal Layout */
 .modal-overlay {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
@@ -216,18 +211,70 @@ button {
     padding: 40px;
     border-radius: 15px;
     text-align: center;
-    box-shadow: 0 0 20px rgba(255, 159, 67, 0.3);
 }
-
 .victory-card h2 { font-size: 2.5rem; color: #fff; margin-bottom: 30px; }
 .home-btn { background: var(--accent-color); color: #000; border: none; padding: 12px 30px; font-size: 1.1rem; }
 
-/* Placeholder Words view container */
-.word-card-box {
-    background: var(--card-bg);
-    border: 2px dashed var(--accent-color);
-    padding: 40px 20px;
+/* 📲 Handheld Words Interface Styling rules */
+.ready-deck-btn {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    font-size: 2rem;
+    border: 4px solid var(--accent-color);
+    background: #111;
+    color: var(--accent-color);
+    margin: 40px auto;
+    box-shadow: 0 0 15px rgba(255, 159, 67, 0.2);
+}
+
+.ready-deck-btn:active {
+    background: var(--accent-color);
+    color: #000;
+}
+
+.pairing-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    max-width: 500px;
     margin: 20px auto;
-    max-width: 400px;
-    border-radius: 10px;
+    padding: 10px;
+}
+
+.word-box {
+    background: var(--card-bg);
+    border: 2px solid #333;
+    border-radius: 12px;
+    padding: 30px 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 120px;
+}
+
+.adjective-box { border-color: #a1887f; }
+.noun-box { border-color: #90caf9; }
+
+.word-label {
+    font-size: 0.75rem;
+    letter-spacing: 2px;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.word-text {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: #fff;
+    text-transform: capitalize;
+}
+
+.next-pair-btn {
+    background: #28a745;
+    border: none;
+    padding: 12px 40px;
+    font-size: 1.2rem;
+    margin-top: 15px;
 }

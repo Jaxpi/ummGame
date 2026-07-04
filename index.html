@@ -15,7 +15,7 @@
             <h1>Um... Game Companion</h1>
             <div class="menu-buttons">
                 <button id="btn-new-game" onclick="navigateTo('screen-team-select')">New Game</button>
-                <button id="btn-cards-tab" onclick="navigateTo('screen-words-view')">Cards / Words</button>
+                <button id="btn-cards-tab" onclick="openWordsTab()">Cards / Words</button>
             </div>
         </div>
 
@@ -81,10 +81,27 @@
         <!-- Words/Cards Tab Screen View -->
         <div id="screen-words-view" class="screen">
             <h2>Words Deck</h2>
-            <div class="word-card-box">
-                <p class="word-hint">Ready to play?</p>
+            
+            <!-- Dynamic Sub-view Containers managed inside JavaScript -->
+            <div id="words-setup-view">
+                <button id="btn-words-ready" class="ready-deck-btn" onclick="revealPairing()">Ready</button>
             </div>
-            <div class="menu-buttons">
+
+            <div id="words-game-view" class="hidden">
+                <div class="pairing-container">
+                    <div class="word-box adjective-box">
+                        <span class="word-label">ADJECTIVE</span>
+                        <div id="display-adjective" class="word-text">-</div>
+                    </div>
+                    <div class="word-box noun-box">
+                        <span class="word-label">NOUN</span>
+                        <div id="display-noun" class="word-text">-</div>
+                    </div>
+                </div>
+                <button class="next-pair-btn" onclick="drawNextPairing()">Next Pair</button>
+            </div>
+
+            <div class="menu-buttons" style="margin-top: 30px;">
                 <button onclick="resetToHome(event)">Back to Menu</button>
             </div>
         </div>
