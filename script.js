@@ -470,54 +470,52 @@ function triggerVictory(teamName) {
 }
 
 function setupTimerInteractions() {
-  const timerDisplay = document.getElementById("timer-display");
-  let holdTimeout = null;
-  let wasResetThisTouch = false;
+    const timerDisplay = document.getElementById('timer-display');
+    let holdTimeout = null;
+    let wasResetThisTouch = false;
 
-  // 1. Handle regular taps
-  timerDisplay.onclick = function () {
-    if (isTimerLocked) return;
+    // Unified press activation system for mouse and touch inputs
+    const startTrack = (e) => {
+        // Stop browser default handling to prevent ghost clicks on mobile devices
+        if (e.type === 'touchstart') e.preventDefault(); 
+        
+        wasResetThisTouch = false;
+        
+        // Count down exactly 1 second (1000ms) for continuous hold
+        holdTimeout = setTimeout(() => {
+            resetTimer();             // Fire 45 reset instantly while holding down finger
+            wasResetThisTouch = true; // Mark flag to block standard tap action on release
+        }, 1000);
+    };
+    
+    // Unified release execution logic
+    const endTrack = (e) => {
+        if (e.type === 'touchend' || e.type === 'mouseup') {
+            clearTimeout(holdTimeout); // Cancel background hold listener
+            
+            // If the user did NOT hold long enough to trigger a reset, execute standard play/pause
+            if (!wasResetThisTouch && !isTimerLocked) {
+                if (isTimerRunning) {
+                    pauseTimer();
+                } else {
+                    startTimer();
+                }
+            }
+        }
+    };
 
-    // If a reset just happened during this press, block the tap action
-    if (wasResetThisTouch) {
-      wasResetThisTouch = false;
-      return;
-    }
+    const cancelTrack = () => {
+        clearTimeout(holdTimeout);
+    };
 
-    if (isTimerRunning) {
-      pauseTimer();
-    } else {
-      startTimer();
-    }
-  };
-
-  // 2. Start counting time when finger/mouse presses down
-  const startTrack = (e) => {
-    // Prevent double-firing if a device triggers both touch and mouse events
-    if (e.type === "touchstart") e.preventDefault();
-
-    wasResetThisTouch = false;
-
-    // Set a background timer for exactly 1 second (1000ms)
-    holdTimeout = setTimeout(() => {
-      resetTimer(); // Reset visuals instantly *while* holding
-      wasResetThisTouch = true; // Block the lift-up tap trigger
-    }, 1000);
-  };
-
-  // 3. Clean up if player lifts up early or moves away
-  const endTrack = () => {
-    clearTimeout(holdTimeout); // Cancel the 1-second countdown
-  };
-
-  // Bind listeners to support desktop mice and mobile touch screens
-  timerDisplay.onmousedown = startTrack;
-  timerDisplay.onmouseup = endTrack;
-  timerDisplay.onmouseleave = endTrack; // Safety fallback if cursor slides off button
-
-  timerDisplay.ontouchstart = startTrack;
-  timerDisplay.ontouchend = endTrack;
-  timerDisplay.ontouchcancel = endTrack;
+    // Bind listeners across modern tablet/mobile touch and desktop pointer drivers
+    timerDisplay.onmousedown = startTrack;
+    timerDisplay.onmouseup = endTrack;
+    timerDisplay.onmouseleave = cancelTrack;
+    
+    timerDisplay.ontouchstart = startTrack;
+    timerDisplay.ontouchend = endTrack;
+    timerDisplay.ontouchcancel = cancelTrack;
 }
 
 function startTimer() {

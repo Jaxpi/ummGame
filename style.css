@@ -1,11 +1,20 @@
 :root {
-  --bg-color: #121212;
-  --card-bg: #1e1e1e;
-  --accent-color: #ff9f43;
-  --team-a-color: #ff6b6b;
-  --team-b-color: #4ecdc4;
-  --text-color: #ffffff;
-  --square-box-size: 4vw;
+    --bg-color: #121212;
+    --card-bg: #1e1e1e;
+    --accent-color: #ff9f43;
+    --team-a-color: #ff6b6b;
+    --team-b-color: #4ecdc4;
+    --text-color: #ffffff;
+    
+    /* 📱 RESPONSIVE BOX SIZING EMULATOR ENGINE */
+    --square-box-size: 40px; /* Default sizing base for phones */
+}
+
+/* 💻 Automatic scale up base for Tablets and larger screens */
+@media (min-width: 600px) {
+    :root {
+        --square-box-size: 44px; 
+    }
 }
 
 body {
@@ -183,36 +192,37 @@ button {
 }
 
 .cards-display-row {
-  padding-left: 90px;
-  box-sizing: border-box;
+    padding-left: 90px; 
+    box-sizing: border-box;
+    margin: 10px 0;
 }
 
 .cards-inner-grid {
-  display: flex; /* Shifts layout from grid to flex row */
-  justify-content: space-around; /* Distributes cards with even padding between them */
-  align-items: center; /* Centers them vertically in the row */
-  width: 100%;
-  height: 50px;
-  position: relative;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+    height: 55px;
+    position: relative;
 }
 
 .penalty-card {
-  width: calc(var(--square-box-size) * 3);
-  height: calc(
-    (var(--square-box-size) * 3) / 4
-  );
-  background: #252525;
-  border: 2px dashed #555;
-  border-radius: 6px;
-  box-sizing: border-box;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.75rem;
-  padding: 6px;
-  text-align: center;
-  cursor: default;
-  color: #777;
+    width: 110px;   /* Perfect horizontal sizing for text spacing */
+    height: 55px;   /* Strict 2:1 Wide Ratio (twice as wide as it is tall) */
+    
+    background: #252525;
+    border: 2px dashed #555;
+    border-radius: 6px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    padding: 6px;
+    text-align: center;
+    cursor: default;
+    color: #777;
+    font-weight: bold;
 }
 
 .card-milestone-5 {
