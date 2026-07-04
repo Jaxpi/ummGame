@@ -5,17 +5,16 @@
     --team-a-color: #ff6b6b;
     --team-b-color: #4ecdc4;
     --text-color: #ffffff;
+    --square-size: 44px; /* Hard square size optimized for touch screens */
 }
 
 body {
     margin: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: -apple-system, sans-serif;
     background-color: var(--bg-color);
     color: var(--text-color);
     display: flex;
     justify-content: center;
-    align-items: flex-start;
-    min-height: 100vh;
     padding: 10px;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
@@ -23,56 +22,34 @@ body {
 
 #app-container {
     width: 100%;
-    max-width: 600px;
-    text-align: center;
+    max-width: 500px;
 }
 
-.screen {
-    display: none;
-}
+.screen { display: none; }
+.screen.active { display: block; }
 
-.screen.active {
-    display: block;
-}
-
-h1 { color: var(--accent-color); margin-top: 40px; }
-h2 { margin-bottom: 30px; }
-
-.menu-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-    padding: 20px;
-}
+h1 { color: var(--accent-color); margin-top: 20px; }
+.menu-buttons { display: flex; flex-direction: column; gap: 15px; padding: 20px; }
 
 button {
     background-color: var(--card-bg);
     color: var(--text-color);
     border: 2px solid #333;
-    padding: 15px 20px;
+    padding: 15px;
     font-size: 1.2rem;
     font-weight: bold;
     border-radius: 10px;
     cursor: pointer;
-    transition: all 0.2s ease;
 }
 
-button:active {
-    transform: scale(0.98);
-}
-
-#btn-new-game { border-color: var(--accent-color); }
-#btn-team-a { border-color: var(--team-a-color); }
-#btn-team-b { border-color: var(--team-b-color); }
-
+#btn-start-match { border-color: #28a745; background: rgba(40,167,69,0.1); }
 .hidden { display: none !important; }
 
-/* Rules Screen Grid */
+/* Setup view Grid */
 .grid-6 {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    padding: 10px;
+    gap: 10px;
     margin-bottom: 20px;
 }
 
@@ -80,14 +57,12 @@ button:active {
     background-color: var(--card-bg);
     border: 2px solid #444;
     border-radius: 8px;
-    padding: 15px 10px;
-    font-size: 0.95rem;
-    cursor: pointer;
+    padding: 12px;
+    font-size: 0.9rem;
+    min-height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
-    min-height: 70px;
-    user-select: none;
 }
 
 .rule-card.selected {
@@ -95,138 +70,133 @@ button:active {
     background-color: rgba(255, 159, 67, 0.15);
 }
 
-#btn-rules-ready {
-    width: 90%;
-    background-color: #28a745;
-    border: none;
-}
+#btn-rules-ready:disabled { background: #333; color: #777; border-color: #222; }
 
-#btn-rules-ready:disabled {
-    background-color: #444;
-    color: #888;
-    cursor: not-allowed;
-}
-
-/* Timer styles */
-#timer-container {
-    margin-bottom: 15px;
-    user-select: none;
-}
-
+/* Timer interface */
+#timer-container { margin-bottom: 15px; }
 #timer-display {
-    font-size: 3.5rem;
+    font-size: 3rem;
     font-weight: bold;
-    font-family: monospace;
     color: var(--accent-color);
     display: inline-block;
-    padding: 5px 20px;
+    padding: 5px 25px;
     border: 3px solid var(--accent-color);
-    border-radius: 10px;
+    border-radius: 8px;
     background: #000;
     cursor: pointer;
 }
+.timer-hint { font-size: 0.75rem; color: #666; margin: 4px 0; }
 
-.timer-hint {
-    font-size: 0.75rem;
-    color: #888;
-    margin: 4px 0 0 0;
-}
-
-/* Board Layout Styles */
-.board-layout {
+/* Dynamic 3-Column Match Layout */
+.board-wrapper {
     display: grid;
-    grid-template-columns: 75px 1fr 75px;
-    gap: 8px;
-    position: relative;
-    margin-bottom: 20px;
+    grid-template-columns: calc(var(--square-size) * 2) calc(var(--square-size) * 2 + 15px) calc(var(--square-size) * 2);
+    gap: 10px;
+    justify-content: center;
+    margin: 20px auto;
 }
 
-.tracks-container {
+.tracks-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
+    gap: 15px;
 }
 
-.track {
+.track-column {
     display: flex;
-    flex-direction: column-reverse; /* Puts Box 1 at the bottom, Win at top */
+    flex-direction: column;
 }
 
-.track-header {
-    background: #222;
-    padding: 8px 0;
+.track-title {
+    font-size: 0.8rem;
     font-weight: bold;
-    border-radius: 4px;
-    margin-top: 4px;
-    order: 100; /* Puts headers at the very top visually */
+    padding: 5px 0;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 8px;
+}
+.title-a { color: var(--team-a-color); border-bottom: 2px solid var(--team-a-color); }
+.title-b { color: var(--team-b-color); border-bottom: 2px solid var(--team-b-color); }
+
+/* Invert flow layout: Boxes stack from 20 down to 1 visually */
+.squares-stack {
+    display: flex;
+    flex-direction: column-reverse; 
+    gap: 4px;
 }
 
-#track-A .track-header { color: var(--team-a-color); border-bottom: 2px solid var(--team-a-color); }
-#track-B .track-header { color: var(--team-b-color); border-bottom: 2px solid var(--team-b-color); }
-
+/* Strict Square Numbers sizing */
 .board-square {
+    width: var(--square-size);
+    height: var(--square-size);
     background: var(--card-bg);
     border: 1px solid #333;
-    padding: 6px 0;
-    font-size: 0.9rem;
-    font-weight: bold;
-    margin: 1px 0;
-    border-radius: 3px;
-    height: 26px;
+    border-radius: 4px;
     display: flex;
     align-items: center;
     justify-content: center;
+    font-weight: bold;
+    font-size: 0.95rem;
+    box-sizing: border-box;
+    cursor: pointer;
+    margin: 0 auto;
+    transition: background 0.15s ease;
 }
 
 .board-square.win-space {
-    background: #28a745;
-    color: white;
+    background: #1e4620;
+    border-color: #28a745;
 }
 
-/* Penalty Side Columns */
-.penalty-column {
+/* Side Card Containers with relative structural spacing matched to squares stack */
+.card-column {
     display: flex;
     flex-direction: column;
-    justify-content: flex-start;
     position: relative;
-    height: 600px; /* Aligns roughly to the height of the 20 squares */
-    margin-top: 36px; /* Offsets for the column headers */
+    padding-top: 29px; /* Offsets top row to line up squarely with the tracks margin */
 }
 
-.penalty-slot {
+/* Structural Rules: 3 boxes tall, 2 boxes wide */
+.penalty-card {
     position: absolute;
-    width: 75px;
-    height: 94px; /* Exactly equivalent to 3 square boxes + margins */
-    background: #333;
-    border: 2px dashed #666;
+    width: calc(var(--square-size) * 2);
+    height: calc((var(--square-size) * 3) + 8px); 
+    background: #252525;
+    border: 2px dashed #555;
     border-radius: 6px;
+    box-sizing: border-box;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.7rem;
-    padding: 4px;
-    box-sizing: border-box;
-    cursor: pointer;
+    padding: 6px;
     text-align: center;
+    cursor: default;
+    transition: all 0.2s ease;
     word-break: break-word;
-    overflow: hidden;
 }
 
-.penalty-slot.flipped {
-    background: #444;
+/* Perfect alignment coordinates mapping centers to lines 5, 10, and 15 */
+.card-5 { bottom: calc((var(--square-size) * 3) + 12px); }
+.card-10 { bottom: calc((var(--square-size) * 8) + 32px); }
+.card-15 { bottom: calc((var(--square-size) * 13) + 52px); }
+
+/* Trigger Animations & active status */
+.penalty-card.flashing {
+    animation: flash-border 0.4s ease-in-out 5;
+    background: #3a3a1a !important;
+}
+
+.penalty-card.revealed {
+    background: #2d2d2d;
     border: 2px solid var(--accent-color);
-    font-weight: normal;
+    font-size: 0.8rem;
+    font-weight: bold;
 }
 
-/* Precise positioning inline with row centers (5, 10, 15) calculated via flex mapping */
-.slot-15 { top: 112px; }
-.slot-10 { top: 242px; }
-.slot-5  { top: 372px; }
-
-.abandon-btn {
-    background: none;
-    border: 1px solid #555;
-    font-size: 0.9rem;
-    color: #888;
-    padding: 8px 16px;
+@keyframes flash-border {
+    0%, 100% { border-color: #555; }
+    50% { border-color: var(--accent-color); }
 }
+
+.abandon-btn { background: none; border: 1px solid #444; color: #666; margin-top: 25px; font-size: 0.85rem;}

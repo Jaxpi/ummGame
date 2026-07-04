@@ -8,7 +8,6 @@
 </head>
 <body>
 
-    <!-- Main Navigation/App Container -->
     <div id="app-container">
         
         <!-- Welcome Screen -->
@@ -16,7 +15,7 @@
             <h1>Um... Game Companion</h1>
             <div class="menu-buttons">
                 <button id="btn-new-game" onclick="navigateTo('screen-team-select')">New Game</button>
-                <button id="btn-cards-tab" onclick="alert('Words/Cards feature coming in the next step!')">Cards</button>
+                <button id="btn-cards-tab" onclick="alert('Words tab under development!')">Cards</button>
             </div>
         </div>
 
@@ -40,39 +39,39 @@
 
         <!-- Game Board Screen -->
         <div id="screen-game-board" class="screen">
-            <!-- Timer Section -->
+            
             <div id="timer-container">
                 <div id="timer-display">60</div>
-                <p class="timer-hint">Tap to Start/Pause | Hold to Reset</p>
+                <p class="timer-hint">Tap: Play/Pause | Hold 1s: Reset</p>
             </div>
 
-            <!-- Board Layout Container -->
-            <div class="board-layout">
+            <!-- Modern Fluid Grid Layout centering cards exactly beside slots 15, 10, 5 -->
+            <div class="board-wrapper">
                 
-                <!-- Left Penalty Slots (Team B's Cards targeting Team A) -->
-                <div class="penalty-column left-penalties">
-                    <div class="penalty-slot slot-5" onclick="flipCard(this)"><span>Face Down</span></div>
-                    <div class="penalty-slot slot-10" onclick="flipCard(this)"><span>Face Down</span></div>
-                    <div class="penalty-slot slot-15" onclick="flipCard(this)"><span>Face Down</span></div>
+                <!-- Left Cards Column (Targeting Team A) -->
+                <div class="card-column">
+                    <div id="card-left-15" class="penalty-card card-15"><span>Face Down</span></div>
+                    <div id="card-left-10" class="penalty-card card-10"><span>Face Down</span></div>
+                    <div id="card-left-5" class="penalty-card card-5"><span>Face Down</span></div>
                 </div>
 
-                <!-- Track Columns -->
-                <div class="tracks-container">
-                    <!-- Team A Track -->
-                    <div class="track" id="track-A">
-                        <div class="track-header">Team A</div>
+                <!-- Central Numeric Columns -->
+                <div class="tracks-grid">
+                    <div class="track-column">
+                        <div class="track-title title-a">Team A</div>
+                        <div id="squares-container-A" class="squares-stack"></div>
                     </div>
-                    <!-- Team B Track -->
-                    <div class="track" id="track-B">
-                        <div class="track-header">Team B</div>
+                    <div class="track-column">
+                        <div class="track-title title-b">Team B</div>
+                        <div id="squares-container-B" class="squares-stack"></div>
                     </div>
                 </div>
 
-                <!-- Right Penalty Slots (Team A's Cards targeting Team B) -->
-                <div class="penalty-column right-penalties">
-                    <div class="penalty-slot slot-5" onclick="flipCard(this)"><span>Face Down</span></div>
-                    <div class="penalty-slot slot-10" onclick="flipCard(this)"><span>Face Down</span></div>
-                    <div class="penalty-slot slot-15" onclick="flipCard(this)"><span>Face Down</span></div>
+                <!-- Right Cards Column (Targeting Team B) -->
+                <div class="card-column">
+                    <div id="card-right-15" class="penalty-card card-15"><span>Face Down</span></div>
+                    <div id="card-right-10" class="penalty-card card-10"><span>Face Down</span></div>
+                    <div id="card-right-5" class="penalty-card card-5"><span>Face Down</span></div>
                 </div>
 
             </div>

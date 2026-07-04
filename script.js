@@ -1,4 +1,3 @@
-// Master Pool of 32 Rule Cards based on "You Can't Say Umm" mechanics
 const ALL_RULES = [
     "Must clap hands before speaking",
     "Cannot use words starting with 'S'",
@@ -40,50 +39,42 @@ let teamBRules = [];
 let currentSelectingTeam = '';
 let selectedIndices = [];
 
-// Game state variables
+// Game Progression Engine
+let teamAProgress = 0; // Tracks highest tapped square index for Team A
+let teamBProgress = 0; // Tracks highest tapped square index for Team B
+
 let timerInterval = null;
 let timeLeft = 60;
 let isTimerRunning = false;
+let isTimerLocked = false; // Freeze state triggered by milestone hits
 let timerTouchStart = 0;
 
-// Universal Screen Navigator
 function navigateTo(screenId) {
     document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
     document.getElementById(screenId).classList.add('active');
-    
-    if (screenId === 'screen-team-select') {
-        checkGameReadyStatus();
-    }
+    if (screenId === 'screen-team-select') checkGameReadyStatus();
 }
 
-// Fisher-Yates Shuffle Algorithm for mixing cards cleanly
 function shuffle(array) {
     let m = array.length, t, i;
     while (m) {
         i = Math.floor(Math.random() * m--);
-        t = array[m];
-        array[m] = array[i];
-        array[i] = t;
+        t = array[m]; array[m] = array[i]; array[i] = t;
     }
     return array;
 }
 
-// Setup Rule Picker View
 function openRuleSelection(team) {
     currentSelectingTeam = team;
     selectedIndices = [];
     document.getElementById('rule-screen-title').innerText = `Team ${team} Rule Pick`;
     
-    // Get unique pool of 6 items out of the master list
     let shuffledPool = shuffle([...ALL_RULES]);
-    
-    // Safety check: ensure Team B doesn't overlap items already locked by Team A
     if (team === 'B' && teamARules.length > 0) {
         shuffledPool = shuffledPool.filter(rule => !teamARules.includes(rule));
     }
     
     currentTeamPool = shuffledPool.slice(0, 6);
-    
     const grid = document.getElementById('rules-grid');
     grid.innerHTML = '';
     
@@ -91,7 +82,6 @@ function openRuleSelection(team) {
         const card = document.createElement('div');
         card.className = 'rule-card';
         card.innerText = rule;
-        card.dataset.index = index;
         card.addEventListener('click', () => toggleRuleSelection(card, index));
         grid.appendChild(card);
     });
@@ -100,39 +90,33 @@ function openRuleSelection(team) {
     navigateTo('screen-rule-select');
 }
 
-// Handlers for selection restrictions (exactly 3 rule items)
 function toggleRuleSelection(cardElement, index) {
     const pos = selectedIndices.indexOf(index);
     if (pos > -1) {
         selectedIndices.splice(pos, 1);
         cardElement.classList.remove('selected');
-    } else {
-        if (selectedIndices.length < 3) {
-            selectedIndices.push(index);
-            cardElement.classList.add('selected');
-        }
+    } else if (selectedIndices.length < 3) {
+        selectedIndices.push(index);
+        cardElement.classList.add('selected');
     }
     updateReadyButtonState();
 }
 
 function updateReadyButtonState() {
-    const readyBtn = document.getElementById('btn-rules-ready');
-    readyBtn.disabled = (selectedIndices.length !== 3);
+    document.getElementById('btn-rules-ready').disabled = (selectedIndices.length !== 3);
 }
 
 function confirmRules() {
     const chosenRules = selectedIndices.map(idx => currentTeamPool[idx]);
-    
     if (currentSelectingTeam === 'A') {
         teamARules = chosenRules;
-        document.getElementById('btn-team-a').style.opacity = '0.5';
         document.getElementById('btn-team-a').innerText = 'Team A (Selected)';
+        document.getElementById('btn-team-a').style.opacity = '0.6';
     } else {
         teamBRules = chosenRules;
-        document.getElementById('btn-team-b').style.opacity = '0.5';
         document.getElementById('btn-team-b').innerText = 'Team B (Selected)';
+        document.getElementById('btn-team-b').style.opacity = '0.6';
     }
-    
     navigateTo('screen-team-select');
 }
 
@@ -142,64 +126,103 @@ function checkGameReadyStatus() {
     }
 }
 
-// Build Game Board 
 function startGameBoard() {
-    const trackA = document.getElementById('track-A');
-    const trackB = document.getElementById('track-B');
-    
-    // Clear out old spaces if restarting, but keep headers
-    document.querySelectorAll('.board-square').forEach(el => el.remove());
+    teamAProgress = 0;
+    teamBProgress = 0;
+    resetTimer();
 
-    // Generate squares 1 up to Win (20)
-    for (let i = 1; i <= 20; i++) {
-        const label = (i === 20) ? "WIN" : i;
-        const extraClass = (i === 20) ? " win-space" : "";
-        
-        const sqA = document.createElement('div');
-        sqA.className = `board-square${extraClass}`;
-        sqA.innerText = label;
-        trackA.appendChild(sqA);
+    buildTrackSquares('A');
+    buildTrackSquares('B');
 
-        const sqB = document.createElement('div');
-        sqB.className = `board-square${extraClass}`;
-        sqB.innerText = label;
-        trackB.appendChild(sqB);
-    }
+    // Attach text variables into structural dataset keys safely
+    document.getElementById('card-left-5').dataset.rule = teamBRules[0];
+    document.getElementById('card-left-10').dataset.rule = teamBRules[1];
+    document.getElementById('card-left-15').dataset.rule = teamBRules[2];
 
-    // Set Up Face Down Horizontal Slots
-    // CRITICAL REQUIREMENT Swap placement: Team A's cards go on Team B's side (Right) and vice-versa
-    const leftSlots = document.querySelectorAll('.left-penalties .penalty-slot');
-    const rightSlots = document.querySelectorAll('.right-penalties .penalty-slot');
-
-    leftSlots.forEach((slot, index) => {
-        slot.classList.remove('flipped');
-        slot.innerHTML = `<span>Tap to Reveal</span>`;
-        slot.dataset.ruleText = teamBRules[index]; // Team B's cards are placed on Left (Team A's side)
-    });
-
-    rightSlots.forEach((slot, index) => {
-        slot.classList.remove('flipped');
-        slot.innerHTML = `<span>Tap to Reveal</span>`;
-        slot.dataset.ruleText = teamARules[index]; // Team A's cards are placed on Right (Team B's side)
-    });
+    document.getElementById('card-right-5').dataset.rule = teamARules[0];
+    document.getElementById('card-right-10').dataset.rule = teamARules[1];
+    document.getElementById('card-right-15').dataset.rule = teamARules[2];
 
     setupTimerInteractions();
     navigateTo('screen-game-board');
 }
 
-function flipCard(slotElement) {
-    if(!slotElement.classList.contains('flipped')) {
-        slotElement.classList.add('flipped');
-        slotElement.innerHTML = `<strong>${slotElement.dataset.ruleText}</strong>`;
+function buildTrackSquares(teamId) {
+    const container = document.getElementById(`squares-container-${teamId}`);
+    container.innerHTML = '';
+
+    for (let i = 1; i <= 20; i++) {
+        const sq = document.createElement('div');
+        sq.className = 'board-square';
+        if (i === 20) sq.classList.add('win-space');
+        sq.innerText = (i === 20) ? "WIN" : i;
+        
+        sq.addEventListener('click', () => handleSquareTap(teamId, i, sq));
+        container.appendChild(sq);
     }
 }
 
-// Adaptive Touch/Click Timer Control System
+// Sequential Tapping Logic System
+function handleSquareTap(teamId, squareNum, element) {
+    // Win spaces do not change color yet per instructions
+    if (squareNum === 20) return; 
+
+    let currentProgress = (teamId === 'A') ? teamAProgress : teamBProgress;
+
+    // Rule check: Must tap the exact next block in sequence
+    if (squareNum === currentProgress + 1) {
+        if (teamId === 'A') {
+            teamAProgress = squareNum;
+            element.style.background = 'var(--team-a-color)';
+        } else {
+            teamBProgress = squareNum;
+            element.style.background = 'var(--team-b-color)';
+        }
+        element.style.color = '#000';
+
+        // Check for rules milestone activation steps
+        if (squareNum === 5 || squareNum === 10 || squareNum === 15) {
+            triggerMilestoneCard(teamId, squareNum);
+        }
+    }
+}
+
+// Flash, Reveal, and Temporary Timer Freeze Engine
+function triggerMilestoneCard(teamId, step) {
+    // Team A triggers cards placed on Left side (Team B's rules targeting Team A)
+    // Team B triggers cards placed on Right side (Team A's rules targeting Team B)
+    const side = (teamId === 'A') ? 'left' : 'right';
+    const targetCard = document.getElementById(`card-${side}-${step}`);
+    
+    if (!targetCard || targetCard.classList.contains('revealed')) return;
+
+    // Pause timer execution loop instantly
+    let wasRunning = isTimerRunning;
+    isTimerRunning = false;
+    isTimerLocked = true;
+    clearInterval(timerInterval);
+
+    targetCard.classList.add('flashing');
+
+    // Run animation phase then execute string reveal
+    setTimeout(() => {
+        targetCard.classList.remove('flashing');
+        targetCard.classList.add('revealed');
+        targetCard.innerHTML = `<strong>${targetCard.dataset.rule}</strong>`;
+        
+        // Restore timer capabilities after the 2-second rule viewing window closes
+        isTimerLocked = false;
+        if (wasRunning) {
+            startTimer();
+        }
+    }, 2000);
+}
+
 function setupTimerInteractions() {
     const timerDisplay = document.getElementById('timer-display');
     
-    // Normal tap handler
     timerDisplay.onclick = function() {
+        if (isTimerLocked) return;
         if (isTimerRunning) {
             pauseTimer();
         } else {
@@ -207,29 +230,28 @@ function setupTimerInteractions() {
         }
     };
 
-    // Long press logic supporting desktop click & mobile touches
-    const startResetTrack = () => { timerTouchStart = Date.now(); };
-    const endResetTrack = () => {
+    const startTrack = () => { timerTouchStart = Date.now(); };
+    const endTrack = () => {
         if (Date.now() - timerTouchStart >= 1000) {
             resetTimer();
         }
     };
 
-    timerDisplay.onmousedown = startResetTrack;
-    timerDisplay.onmouseup = endResetTrack;
-    timerDisplay.ontouchstart = startResetTrack;
-    timerDisplay.ontouchend = endResetTrack;
+    timerDisplay.onmousedown = startTrack;
+    timerDisplay.onmouseup = endTrack;
+    timerDisplay.ontouchstart = startTrack;
+    timerDisplay.ontouchend = endTrack;
 }
 
 function startTimer() {
-    if (isTimerRunning) return;
+    if (isTimerRunning || isTimerLocked) return;
     isTimerRunning = true;
     timerInterval = setInterval(() => {
         timeLeft--;
         document.getElementById('timer-display').innerText = timeLeft;
         if (timeLeft <= 0) {
             pauseTimer();
-            alert("Time's Up!");
+            alert("Time is up!");
         }
     }, 1000);
 }
