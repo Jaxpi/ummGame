@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Don't Say Umm - Companion</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Main Navigation/App Container -->
+    <div id="app-container">
+        
+        <!-- Welcome Screen -->
+        <div id="screen-welcome" class="screen active">
+            <h1>Um... Game Companion</h1>
+            <div class="menu-buttons">
+                <button id="btn-new-game" onclick="navigateTo('screen-team-select')">New Game</button>
+                <button id="btn-cards-tab" onclick="alert('Words/Cards feature coming in the next step!')">Cards</button>
+            </div>
+        </div>
+
+        <!-- Team Selection Screen -->
+        <div id="screen-team-select" class="screen">
+            <h2>Select Team to Pick Rules</h2>
+            <div class="menu-buttons">
+                <button id="btn-team-a" onclick="openRuleSelection('A')">Team A</button>
+                <button id="btn-team-b" onclick="openRuleSelection('B')">Team B</button>
+                <button id="btn-start-match" class="hidden" onclick="startGameBoard()">Start Match</button>
+            </div>
+        </div>
+
+        <!-- Rule Selection Screen -->
+        <div id="screen-rule-select" class="screen">
+            <h2 id="rule-screen-title">Team Selection</h2>
+            <p class="subtitle">Tap to select exactly 3 penalty rules:</p>
+            <div id="rules-grid" class="grid-6"></div>
+            <button id="btn-rules-ready" disabled onclick="confirmRules()">Ready</button>
+        </div>
+
+        <!-- Game Board Screen -->
+        <div id="screen-game-board" class="screen">
+            <!-- Timer Section -->
+            <div id="timer-container">
+                <div id="timer-display">60</div>
+                <p class="timer-hint">Tap to Start/Pause | Hold to Reset</p>
+            </div>
+
+            <!-- Board Layout Container -->
+            <div class="board-layout">
+                
+                <!-- Left Penalty Slots (Team B's Cards targeting Team A) -->
+                <div class="penalty-column left-penalties">
+                    <div class="penalty-slot slot-5" onclick="flipCard(this)"><span>Face Down</span></div>
+                    <div class="penalty-slot slot-10" onclick="flipCard(this)"><span>Face Down</span></div>
+                    <div class="penalty-slot slot-15" onclick="flipCard(this)"><span>Face Down</span></div>
+                </div>
+
+                <!-- Track Columns -->
+                <div class="tracks-container">
+                    <!-- Team A Track -->
+                    <div class="track" id="track-A">
+                        <div class="track-header">Team A</div>
+                    </div>
+                    <!-- Team B Track -->
+                    <div class="track" id="track-B">
+                        <div class="track-header">Team B</div>
+                    </div>
+                </div>
+
+                <!-- Right Penalty Slots (Team A's Cards targeting Team B) -->
+                <div class="penalty-column right-penalties">
+                    <div class="penalty-slot slot-5" onclick="flipCard(this)"><span>Face Down</span></div>
+                    <div class="penalty-slot slot-10" onclick="flipCard(this)"><span>Face Down</span></div>
+                    <div class="penalty-slot slot-15" onclick="flipCard(this)"><span>Face Down</span></div>
+                </div>
+
+            </div>
+            
+            <button class="abandon-btn" onclick="location.reload()">Abandon Game</button>
+        </div>
+
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
