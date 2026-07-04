@@ -314,12 +314,17 @@ function setupTimerInteractions() {
 function startTimer() {
     if (isTimerRunning || isTimerLocked) return; 
     isTimerRunning = true;
+    
+    // Clear any "Time Up" styling if restarting a fresh countdown
+    document.getElementById('timer-display').classList.remove('time-up');
+
     timerInterval = setInterval(() => { 
         timeLeft--; 
         document.getElementById('timer-display').innerText = timeLeft; 
         if (timeLeft <= 0) { 
             pauseTimer(); 
-            alert("Time is up!"); 
+            // Change colors immediately when reaching zero
+            document.getElementById('timer-display').classList.add('time-up');
         } 
     }, 1000);
 }
@@ -329,8 +334,10 @@ function pauseTimer() {
     clearInterval(timerInterval); 
 }
 
-function resetTimer() { 
+function resetTimer() {
     pauseTimer(); 
     timeLeft = 60; 
-    document.getElementById('timer-display').innerText = timeLeft; 
+    const timerEl = document.getElementById('timer-display');
+    timerEl.innerText = timeLeft; 
+    timerEl.classList.remove('time-up'); // Clear red background color
 }

@@ -81,13 +81,14 @@ button {
 #timer-display {
     font-size: 2.8rem;
     font-weight: bold;
-    color: var(--accent-color);
+    color: #ffffff; /* White text */
     display: inline-block;
     padding: 4px 30px;
-    border: 3px solid var(--accent-color);
+    border: 3px solid #28a745; /* Green border matching win box */
     border-radius: 8px;
-    background: #000;
+    background: #1e4620; /* Green background matching win box */
     cursor: pointer;
+    transition: all 0.2s ease;
 }
 .timer-hint { font-size: 0.75rem; color: #666; margin: 2px 0; }
 
@@ -156,7 +157,7 @@ button {
 }
 
 .penalty-card {
-    grid-column-span: 3;
+    grid-column-span: 5; /* Expands width across 5 track columns to prevent text overflow */
     aspect-ratio: 2 / 1;
     height: 100%;
     background: #252525;
@@ -277,4 +278,10 @@ button {
     padding: 12px 40px;
     font-size: 1.2rem;
     margin-top: 15px;
+}
+
+#timer-display.time-up {
+    background: #ff6b6b !important; /* Red background */
+    border-color: #ff6b6b !important;
+    color: #000000 !important;       /* Black text */
 }
