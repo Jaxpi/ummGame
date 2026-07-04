@@ -299,23 +299,59 @@ function triggerVictory(teamName) {
 
 function setupTimerInteractions() {
     const timerDisplay = document.getElementById('timer-display');
-    timerDisplay.onclick = function() { 
-        if (isTimerLocked) return; 
-        if (isTimerRunning) pauseTimer(); else startTimer(); 
+    let holdTimeout = null;
+    let wasResetThisTouch = false;
+    
+    // 1. Handle regular taps
+    timerDisplay.onclick = function() {
+        if (isTimerLocked) return;
+        
+        // If a reset just happened during this press, block the tap action
+        if (wasResetThisTouch) {
+            wasResetThisTouch = false;
+            return;
+        }
+        
+        if (isTimerRunning) {
+            pauseTimer();
+        } else {
+            startTimer();
+        }
     };
-    const startTrack = () => { timerTouchStart = Date.now(); };
-    const endTrack = () => { if (Date.now() - timerTouchStart >= 1000) resetTimer(); };
-    timerDisplay.onmousedown = startTrack; 
-    timerDisplay.onmouseup = endTrack; 
-    timerDisplay.ontouchstart = startTrack; 
+
+    // 2. Start counting time when finger/mouse presses down
+    const startTrack = (e) => {
+        // Prevent double-firing if a device triggers both touch and mouse events
+        if (e.type === 'touchstart') e.preventDefault(); 
+        
+        wasResetThisTouch = false;
+        
+        // Set a background timer for exactly 1 second (1000ms)
+        holdTimeout = setTimeout(() => {
+            resetTimer();          // Reset visuals instantly *while* holding
+            wasResetThisTouch = true; // Block the lift-up tap trigger
+        }, 1000);
+    };
+    
+    // 3. Clean up if player lifts up early or moves away
+    const endTrack = () => {
+        clearTimeout(holdTimeout); // Cancel the 1-second countdown
+    };
+
+    // Bind listeners to support desktop mice and mobile touch screens
+    timerDisplay.onmousedown = startTrack;
+    timerDisplay.onmouseup = endTrack;
+    timerDisplay.onmouseleave = endTrack; // Safety fallback if cursor slides off button
+    
+    timerDisplay.ontouchstart = startTrack;
     timerDisplay.ontouchend = endTrack;
+    timerDisplay.ontouchcancel = endTrack;
 }
 
 function startTimer() {
     if (isTimerRunning || isTimerLocked) return; 
     isTimerRunning = true;
     
-    // Clear any "Time Up" styling if restarting a fresh countdown
     document.getElementById('timer-display').classList.remove('time-up');
 
     timerInterval = setInterval(() => { 
@@ -323,15 +359,9 @@ function startTimer() {
         document.getElementById('timer-display').innerText = timeLeft; 
         if (timeLeft <= 0) { 
             pauseTimer(); 
-            // Change colors immediately when reaching zero
             document.getElementById('timer-display').classList.add('time-up');
         } 
     }, 1000);
-}
-
-function pauseTimer() { 
-    isTimerRunning = false; 
-    clearInterval(timerInterval); 
 }
 
 function resetTimer() {
@@ -339,5 +369,10 @@ function resetTimer() {
     timeLeft = 60; 
     const timerEl = document.getElementById('timer-display');
     timerEl.innerText = timeLeft; 
-    timerEl.classList.remove('time-up'); // Clear red background color
+    timerEl.classList.remove('time-up');
+}
+
+function pauseTimer() { 
+    isTimerRunning = false; 
+    clearInterval(timerInterval); 
 }
