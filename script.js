@@ -343,18 +343,122 @@ function openRuleSelection(team) {
   if (team === "B" && teamARules.length > 0) {
     shuffledPool = shuffledPool.filter((rule) => !teamARules.includes(rule));
   }
-  currentTeamPool = shuffledPool.slice(0, 6);
+  // Always include one Custom card plus 5 random rules
+  const randomFive = shuffledPool.slice(0, 5);
+  currentTeamPool = [...randomFive, "__CUSTOM__"];
   const grid = document.getElementById("rules-grid");
   grid.innerHTML = "";
   currentTeamPool.forEach((rule, index) => {
     const card = document.createElement("div");
     card.className = "rule-card";
-    card.innerText = rule;
-    card.addEventListener("click", () => toggleRuleSelection(card, index));
+    if (rule === "__CUSTOM__") {
+      card.innerText = "Custom";
+      card.dataset.custom = "true";
+      card.addEventListener("click", () => openCustomInput(index, card));
+    } else {
+      card.innerText = rule;
+      card.addEventListener("click", () => toggleRuleSelection(card, index));
+    }
     grid.appendChild(card);
   });
   updateReadyButtonState();
   navigateTo("screen-rule-select");
+}
+
+function openCustomInput(index, cardElement) {
+  // If a custom rule already exists at this index, allow toggling selection
+  if (currentTeamPool[index] && currentTeamPool[index] !== "__CUSTOM__") {
+    return toggleRuleSelection(cardElement, index);
+  }
+
+  // Build simple overlay input to trigger on-screen keyboard on mobile
+  const overlay = document.createElement('div');
+  overlay.style.position = 'fixed';
+  overlay.style.left = 0;
+  overlay.style.top = 0;
+  overlay.style.right = 0;
+  overlay.style.bottom = 0;
+  overlay.style.background = 'rgba(0,0,0,0.4)';
+  overlay.style.display = 'flex';
+  overlay.style.alignItems = 'center';
+  overlay.style.justifyContent = 'center';
+  overlay.style.zIndex = 9999;
+
+  const box = document.createElement('div');
+  box.style.background = 'white';
+  box.style.padding = '12px';
+  box.style.borderRadius = '8px';
+  box.style.minWidth = '260px';
+  box.style.boxShadow = '0 4px 10px rgba(0,0,0,0.3)';
+
+  const input = document.createElement('input');
+  input.type = 'text';
+  input.placeholder = 'Enter custom rule';
+  input.style.width = '100%';
+  input.style.fontSize = '1rem';
+  input.style.padding = '8px';
+
+  const actions = document.createElement('div');
+  actions.style.display = 'flex';
+  actions.style.justifyContent = 'flex-end';
+  actions.style.gap = '8px';
+  actions.style.marginTop = '8px';
+
+  const btnCancel = document.createElement('button');
+  btnCancel.innerText = 'Cancel';
+  btnCancel.onclick = () => document.body.removeChild(overlay);
+
+  const btnOk = document.createElement('button');
+  btnOk.innerText = 'OK';
+  btnOk.onclick = () => finishCustomInput();
+
+  actions.appendChild(btnCancel);
+  actions.appendChild(btnOk);
+  box.appendChild(input);
+  box.appendChild(actions);
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  // Focus to open keyboard on mobile
+  setTimeout(() => input.focus(), 50);
+
+  function finishCustomInput() {
+    const val = input.value && input.value.trim();
+    if (!val) {
+      // nothing entered - just close
+      document.body.removeChild(overlay);
+      return;
+    }
+
+    // Prevent choosing a custom rule that duplicates existing team A rules when selecting for B
+    if (currentSelectingTeam === 'B' && teamARules.includes(val)) {
+      alert('That rule duplicates Team A\'s rule. Choose a different custom rule.');
+      return;
+    }
+
+    // Also prevent duplicates among the visible pool
+    if (currentTeamPool.includes(val)) {
+      alert('That rule is already present. Enter a different rule.');
+      return;
+    }
+
+    // Save custom text into the pool and update card
+    currentTeamPool[index] = val;
+    cardElement.innerText = val;
+    cardElement.dataset.custom = 'entered';
+    document.body.removeChild(overlay);
+
+    // Auto-select the custom card once entered (if under selection limit)
+    if (selectedIndices.length < 3) {
+      toggleRuleSelection(cardElement, index);
+    }
+  }
+
+  // Allow Enter key to submit
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') finishCustomInput();
+    if (e.key === 'Escape') document.body.removeChild(overlay);
+  });
 }
 
 function toggleRuleSelection(cardElement, index) {
